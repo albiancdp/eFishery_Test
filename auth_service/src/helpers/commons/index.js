@@ -1,7 +1,5 @@
-const ROLE_USER = {
+import password from './password';
 
-};
-
-export {
-  ROLE_USER,
+export default {
+  password,
 };

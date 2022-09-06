@@ -1,5 +1,5 @@
-import wishlistDomain from './wishlist';
+import authDomain from './auth';
 
 export default {
-  wishlistDomain,
+  authDomain,
 };

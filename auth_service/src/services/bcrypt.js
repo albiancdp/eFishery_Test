@@ -1,24 +1,20 @@
 import bcrypt from 'bcryptjs';
 
 const getHash = (password) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const salt = bcrypt.genSaltSync(10);
-      resolve(bcrypt.hashSync(password, salt));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  try {
+    const salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
+  } catch (error) {
+    return error;
+  }
 };
 
 const checkHash = (password, hash) => {
-  return new Promise((resolve, reject) => {
-    try {
-      resolve(bcrypt.compareSync(password, hash));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  try {
+    return bcrypt.compareSync(password, hash);
+  } catch (error) {
+    return error;
+  }
 };
 
 export default {
