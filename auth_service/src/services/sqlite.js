@@ -13,9 +13,10 @@ let db = new sqlite3.Database(DB_SOURCE, (err) => {
     db.run(`CREATE TABLE user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name text, 
-            email text UNIQUE, 
+            phone text UNIQUE, 
             password text, 
-            CONSTRAINT email_unique UNIQUE (email)
+            role text, 
+            CONSTRAINT phone_unique UNIQUE (phone)
             )`,
     (err) => {
       if (err) {
