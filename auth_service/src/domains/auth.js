@@ -28,7 +28,7 @@ const register = (data) => {
 const login = (data) => {
   return new Promise((resolve, reject) => {
     try {
-      const query = 'SELECT name, phone, role, password FROM user WHERE phone = ?;';
+      const query = 'SELECT name, phone, role, password, created_at FROM user WHERE phone = ?;';
       const value = [data.phone];
       db.get(query, value, (err, result) => {
         if (err) {

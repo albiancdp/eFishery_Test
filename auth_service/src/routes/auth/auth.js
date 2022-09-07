@@ -11,4 +11,7 @@ router.route(configs.routeBase + '/auth/register')
 router.route(configs.routeBase + '/auth/login')
   .post(indexValidator.login(), indexController.authController.login);
 
+router.route(configs.routeBase + '/auth/')
+  .get(indexController.authController.profile);
+
 export default router;
