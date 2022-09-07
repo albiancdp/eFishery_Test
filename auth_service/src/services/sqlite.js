@@ -16,6 +16,7 @@ let db = new sqlite3.Database(DB_SOURCE, (err) => {
             phone text UNIQUE, 
             password text, 
             role text, 
+            created_at timestamp DEFAULT CURRENT_TIMESTAMP, 
             CONSTRAINT phone_unique UNIQUE (phone)
             )`,
     (err) => {
