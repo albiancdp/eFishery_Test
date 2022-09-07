@@ -30,7 +30,7 @@ const login = (data) => {
     try {
       const query = 'SELECT name, phone, role, password FROM user WHERE phone = ?;';
       const value = [data.phone];
-      db.run(query, value, (err, result) => {
+      db.get(query, value, (err, result) => {
         if (err) {
           reject(err);
         } else {
