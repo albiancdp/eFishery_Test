@@ -9,6 +9,10 @@ const config = {
     https_enable: process.env.HTTPS_ENABLE || false,
     ssl_cert_dir: process.env.SSL_CERT_DIR || '.'
   },
+  jwt:{
+    key: process.env.JWT_KEY || 'my_secret_key',
+    expiredIn: process.env.JWT_EXPIRED_IN || '3d'
+  },
   routeBase: process.env.ROUTE_BASE || '/api/v1',
 };
 
