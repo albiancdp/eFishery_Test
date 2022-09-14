@@ -14,9 +14,10 @@ func main() {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 
-	v1 := r.Group("/api/v1")
-	v1.Use(JwtMiddleware.UserRole).GET("resource/fetch", ResourceController.FetchResource)
-	v1.Use(JwtMiddleware.AdminRole).GET("resource/aggregate", ResourceController.FetchResource)
+	v1User := r.Group("/api/v1/user")
+	v1Admin := r.Group("/api/v1/admin")
+	v1User.Use(JwtMiddleware.UserRole).GET("resource/fetch", ResourceController.FetchResource)
+	v1Admin.Use(JwtMiddleware.AdminRole).GET("resource/aggregate", ResourceController.FetchResource)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})

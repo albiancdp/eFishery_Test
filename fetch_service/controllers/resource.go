@@ -94,3 +94,26 @@ func (ctrl ResourceController) FetchResource(c *gin.Context) {
 		"message": "response found",
 	})
 }
+
+func (ctrl ResourceController) AggregateResource(c *gin.Context) {
+	var dataResponse []ResponseBody
+	price := ExchangeService.GetCurrentPrice()
+	if price == 0 {
+		price = ExchangeService.RequestCurrentPrice()
+	}
+	responseArray := getRequestEfishery()
+	for i := 1; i < len(responseArray); i++ {
+		element := responseArray[i]
+		if element.Uuid != "" {
+			priceIDR, err := strconv.ParseFloat(element.Price, 64)
+			checkError(err)
+			priceUSD := float64(int((priceIDR/price)*100)) / 100
+			responseArray[i].PriceUSD = "$" + strconv.FormatFloat(priceUSD, 'f', 2, 64)
+			dataResponse = append(dataResponse, responseArray[i])
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":    dataResponse,
+		"message": "response found",
+	})
+}

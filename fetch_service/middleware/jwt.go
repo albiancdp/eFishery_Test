@@ -60,7 +60,7 @@ func parseToken(jwtToken string) (*jwt.Token, error) {
 func JwtTokenCheck(c *gin.Context) string {
 	jwtToken, err := extractBearerToken(c.GetHeader("Authorization"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, UnsignedResponse{
+		c.AbortWithStatusJSON(http.StatusUnauthorized, UnsignedResponse{
 			Message: err.Error(),
 		})
 		return ""
@@ -68,7 +68,7 @@ func JwtTokenCheck(c *gin.Context) string {
 
 	token, err := parseToken(jwtToken)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, UnsignedResponse{
+		c.AbortWithStatusJSON(http.StatusUnauthorized, UnsignedResponse{
 			Message: "bad jwt token",
 		})
 		return ""
@@ -97,7 +97,12 @@ func (ctrl JwtMiddleware) UserRole(c *gin.Context) {
 	roleJwt := JwtTokenCheck(c)
 	if roleJwt == "user" {
 		c.Next()
+	} else if roleJwt == "" {
+		return
 	} else {
+		c.AbortWithStatusJSON(http.StatusForbidden, UnsignedResponse{
+			Message: "role not permit",
+		})
 		return
 	}
 }
