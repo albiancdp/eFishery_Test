@@ -15,10 +15,14 @@ func main() {
 	r.Use(CORSMiddleware())
 
 	v1 := r.Group("/api/v1")
-	v1.Use(JwtMiddleware.JwtTokenCheck)
-	v1.GET("resource/fetch", ResourceController.FetchResource)
+	v1.Use(JwtMiddleware.UserRole).GET("resource/fetch", ResourceController.FetchResource)
+	v1.Use(JwtMiddleware.AdminRole).GET("resource/aggregate", ResourceController.FetchResource)
 
-	r.Run()
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
+	})
+
+	r.Run(":3001")
 }
 
 func CORSMiddleware() gin.HandlerFunc {

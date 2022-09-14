@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -16,6 +15,13 @@ type JwtMiddleware struct{}
 
 type UnsignedResponse struct {
 	Message interface{} `json:"message"`
+}
+type MyClaims struct {
+	jwt.StandardClaims
+	Name      string `json:"name"`
+	Phone     string `json:"phone"`
+	Role      string `json:"role"`
+	CreatedAt string `json:"created_at"`
 }
 
 func extractBearerToken(header string) (string, error) {
@@ -38,13 +44,12 @@ func parseToken(jwtToken string) (*jwt.Token, error) {
 	}
 
 	secretTokenJwt := os.Getenv("JWT_KEY")
-	token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
-		if _, OK := token.Method.(*jwt.SigningMethodHMAC); !OK {
-			return nil, errors.New("bad signed method received")
+	token, err := jwt.ParseWithClaims(jwtToken, &MyClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
 		}
 		return []byte(secretTokenJwt), nil
 	})
-	fmt.Println(secretTokenJwt)
 	if err != nil {
 		return nil, errors.New("bad jwt token")
 	}
@@ -52,13 +57,13 @@ func parseToken(jwtToken string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func (ctrl JwtMiddleware) JwtTokenCheck(c *gin.Context) {
+func JwtTokenCheck(c *gin.Context) string {
 	jwtToken, err := extractBearerToken(c.GetHeader("Authorization"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, UnsignedResponse{
 			Message: err.Error(),
 		})
-		return
+		return ""
 	}
 
 	token, err := parseToken(jwtToken)
@@ -66,15 +71,33 @@ func (ctrl JwtMiddleware) JwtTokenCheck(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, UnsignedResponse{
 			Message: "bad jwt token",
 		})
-		return
+		return ""
 	}
 
-	_, OK := token.Claims.(jwt.MapClaims)
+	claims, OK := token.Claims.(*MyClaims)
 	if !OK {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, UnsignedResponse{
 			Message: "unable to parse claims",
 		})
+		return ""
+	}
+	return claims.Role
+}
+
+func (ctrl JwtMiddleware) AdminRole(c *gin.Context) {
+	roleJwt := JwtTokenCheck(c)
+	if roleJwt == "admin" {
+		c.Next()
+	} else {
 		return
 	}
-	c.Next()
+}
+
+func (ctrl JwtMiddleware) UserRole(c *gin.Context) {
+	roleJwt := JwtTokenCheck(c)
+	if roleJwt == "user" {
+		c.Next()
+	} else {
+		return
+	}
 }
