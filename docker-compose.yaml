@@ -5,11 +5,11 @@ services:
     build:
       context: ./gateway
       dockerfile: Dockerfile
-    networks:
-      - auth_service
-      - fetch_service
+    container_name: api_gateway
     ports:
-      - 8080:8080
+      - 8080:80
+    expose:
+      - "8080"
 
   auth_service:
     build:
@@ -17,6 +17,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    container_name: auth_service
     expose:
       - "3000"
     environment:
@@ -29,14 +30,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
+    container_name: fetch_service
     environment:
       - PORT=3001
       - JWT_KEY=SecretBangett
-      
-networks:
-  auth_service:
-    external:
-      name: auth_service
-  fetch_service:
-    external:
-      name: fetch_service
+
+# networks:
+#   auth_service:
+#     external:
+#       name: auth_service
+#   fetch_service:
+#     external:
+#       name: fetch_service

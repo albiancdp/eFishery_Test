@@ -23,7 +23,7 @@ Microservice
 
 ## Context And Development
 
-![alt text](https://github.com/albiancdp/eFishery_Test/blob/main/documentation/context_deployment.jpg?raw=true)
+![alt text](https://github.com/albiancdp/eFishery_Test/blob/main/documentation/context_deployment.png?raw=true)
 
 ## Installation
 
