@@ -4,20 +4,33 @@ import (
 	"fetch_service/controllers"
 	"fetch_service/middleware"
 
+	"fetch_service/models"
+
 	"github.com/gin-gonic/gin"
 )
 
 var ResourceController = new(controllers.ResourceController)
 var JwtMiddleware = new(middleware.JwtMiddleware)
 
+func checkError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 
+	err := models.ConnectDatabase()
+	checkError(err)
+	errMigrate := models.Migration()
+	checkError(errMigrate)
+
 	v1User := r.Group("/api/v1/user")
 	v1Admin := r.Group("/api/v1/admin")
 	v1User.Use(JwtMiddleware.UserRole).GET("resource/fetch", ResourceController.FetchResource)
-	v1Admin.Use(JwtMiddleware.AdminRole).GET("resource/aggregate", ResourceController.FetchResource)
+	v1Admin.Use(JwtMiddleware.AdminRole).GET("resource/aggregate", ResourceController.AggregateResource)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})

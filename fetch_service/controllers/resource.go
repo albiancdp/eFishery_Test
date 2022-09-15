@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
+	"fetch_service/models"
 	"fetch_service/service"
 
 	"github.com/gin-gonic/gin"
@@ -96,7 +98,6 @@ func (ctrl ResourceController) FetchResource(c *gin.Context) {
 }
 
 func (ctrl ResourceController) AggregateResource(c *gin.Context) {
-	var dataResponse []ResponseBody
 	price := ExchangeService.GetCurrentPrice()
 	if price == 0 {
 		price = ExchangeService.RequestCurrentPrice()
@@ -109,11 +110,17 @@ func (ctrl ResourceController) AggregateResource(c *gin.Context) {
 			checkError(err)
 			priceUSD := float64(int((priceIDR/price)*100)) / 100
 			responseArray[i].PriceUSD = "$" + strconv.FormatFloat(priceUSD, 'f', 2, 64)
-			dataResponse = append(dataResponse, responseArray[i])
+			models.CreateTask(responseArray[i])
 		}
 	}
+	resultGet, err := models.GetTasks()
+	checkError(err)
+	resultDelete, err := models.DeleteTask()
+	checkError(err)
+	fmt.Println(resultDelete)
+
 	c.JSON(http.StatusOK, gin.H{
-		"data":    dataResponse,
+		"data":    resultGet,
 		"message": "response found",
 	})
 }
