@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+
+  proxy:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    networks:
+      - auth_service
+      - fetch_service
+    ports:
+      - 8080:8080
+
+  auth_service:
+    build:
+      context: ./auth_service
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    environment:
+      - PORT=3000
+      - JWT_KEY=SecretBangett
+
+  fetch_service:
+    build:
+      context: ./fetch_service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - JWT_KEY=SecretBangett
+      
+networks:
+  auth_service:
+    external:
+      name: auth_service
+  fetch_service:
+    external:
+      name: fetch_service

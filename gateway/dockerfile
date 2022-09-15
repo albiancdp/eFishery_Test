@@ -1,0 +1,4 @@
+FROM nginx:1.9
+
+# New default conf containing the proxy config
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
